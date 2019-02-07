@@ -127,6 +127,17 @@ textarea:focus{
     border: 2px solid #24576a;
 }
 
+.btn.logout{
+    background-color: #b8c6bb;
+    border: 2px solid #898c7b;
+    margin-bottom: 10px;
+}
+
+.btn.logout:hover{
+    background-color: #7b8d79;
+    border: 2px solid #6c8664;
+}
+
 input.login, input.password{
     margin-right: 10px;
     padding: 10px;

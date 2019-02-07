@@ -39,6 +39,12 @@ class Field extends React.Component {
         this.setState({tasks: arr});
     };
 
+    logout = () => {
+        logoutTasks();
+        stage="auth";
+        switchScreen();
+    };
+
     render(){
         return(
             <div className="field">
@@ -47,6 +53,7 @@ class Field extends React.Component {
                 {
                     this.state.tasks.map((item, i) => <Task key={i} index={i} update={this.updateText} remove={this.deleteBlock}>{item}</Task>)
                 }
+                <button className="btn logout" onClick={this.logout}>logout</button>
             </div>
         );
     };
@@ -68,8 +75,8 @@ class Auth extends React.Component{
     render(){
         return(
             <div className="field">
-                    <input className="login" ref="login" placeholder="login"/>
-                    <input className="password" ref="password" placeholder="password"/>
+                    <input className="login" type="text" ref="login" placeholder="login"/>
+                    <input className="password" type="password" ref="password" placeholder="password"/>
                     <button className="btn login" onClick={this.auth}>login</button>
                     <button className="btn registration" onClick={this.reg}>registration</button>
             </div>

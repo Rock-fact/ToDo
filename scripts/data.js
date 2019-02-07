@@ -37,7 +37,6 @@ function regTasks(login, password) {
             query = JSON.stringify(q);
             url = baseUrl+"?apiKey="+apiKey;
             $.ajax({url: url, data: query, type: "POST", contentType: "application/json"}).then(function (res) {
-                console.log(res);
                 currLogin = login;
                 currPassword = password;
                 loadCallback([]);
@@ -56,8 +55,12 @@ function saveTasks(arr) {
     let data = JSON.stringify({ "$set" : { "todos" : arr } } );
     url = baseUrl+"?apiKey="+apiKey+"&q="+query;
     $.ajax({url: url, data : data, type : "PUT", contentType : "application/json"}).then(function (res) {
-        console.log(res);
     }, function (err) {
         console.log(err);
     });
+}
+
+function logoutTasks() {
+    currLogin = "";
+    currPassword = "";
 }

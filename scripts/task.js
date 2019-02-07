@@ -9,7 +9,7 @@ class Task extends React.Component {
             this.state = {
                 edit: true
             };
-        };
+        }
     };
 
 

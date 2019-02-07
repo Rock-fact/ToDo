@@ -1,12 +1,58 @@
 const root = document.getElementById("root");
 let cache = [];
-let stage = "auth";
+let message = "";
+
+class MainContainer extends React.Component{
+    constructor(props){
+        super(props);
+        this.state = {
+          stage: "auth"
+        };
+    }
+
+    stageChange = (newState) => {
+        this.setState({
+            stage : newState
+            });
+    };
+
+    render() {
+        if(this.state.stage === "auth"){
+            return (
+                <div className="field">
+                    <Auth onStageChange={this.stageChange}/>
+                </div>
+            );
+        }else if(this.state.stage === "main"){
+            return (
+                <div className="field">
+                    <Field loadedTasks={JSON.stringify(cache)}  onStageChange={this.stageChange}/>
+                </div>
+            );
+        }else if(this.state.stage === "progress"){
+            return (
+                    <div className="field">
+                        <Progress/>
+                    </div>
+            );
+        }else if(this.state.stage === "error"){
+            return (
+                <div className="field">
+                    <Auth onStageChange={this.stageChange}/>
+                    <div className="warning">
+                        <h2>{message}</h2>
+                    </div>
+                </div>
+            );
+        }
+    }
+}
 
 class Field extends React.Component {
     constructor(props) {
         super(props);
         if(props.loadedTasks){
-            let arr = JSON.parse(props.loadedTasks);
+           let arr = JSON.parse(props.loadedTasks);
            this.state = {
                tasks : arr
            }
@@ -41,8 +87,7 @@ class Field extends React.Component {
 
     logout = () => {
         logoutTasks();
-        stage="auth";
-        switchScreen();
+        this.props.onStageChange("auth");
     };
 
     render(){
@@ -61,24 +106,32 @@ class Field extends React.Component {
 
 class Auth extends React.Component{
     auth = () => {
-        stage = "progress";
-        switchScreen();
-        loadTasks(this.refs.login.value, this.refs.password.value);
+        this.props.onStageChange("progress");
+        loadTasks(this.refs.login.value, this.refs.password.value, this.changeStage);
     };
 
     reg = () => {
-        stage = "progress";
-        switchScreen();
-        regTasks(this.refs.login.value, this.refs.password.value);
+        this.props.onStageChange("progress");
+        regTasks(this.refs.login.value, this.refs.password.value, this.changeStage);
+    };
+
+    changeStage = (res, body) =>{
+        if(res === true){
+            cache = body;
+            this.props.onStageChange("main");
+        }else {
+            message = body;
+            this.props.onStageChange("error");
+        }
     };
 
     render(){
         return(
-            <div className="field">
-                    <input className="login" type="text" ref="login" placeholder="login"/>
-                    <input className="password" type="password" ref="password" placeholder="password"/>
-                    <button className="btn login" onClick={this.auth}>login</button>
-                    <button className="btn registration" onClick={this.reg}>registration</button>
+            <div>
+                    <div><input className="login" type="text" ref="login" placeholder="login"/></div>
+                    <div><input className="password" type="password" ref="password" placeholder="password"/></div>
+                    <div><button className="btn login" onClick={this.auth}>login</button>
+                    <button className="btn registration" onClick={this.reg}>registration</button></div>
             </div>
         );
     }
@@ -87,54 +140,13 @@ class Auth extends React.Component{
 class Progress extends React.Component{
     render(){
         return(
-          <div className="warning field">
+          <div className="warning">
               <h1>Loading...</h1>
           </div>
         );
     }
 }
 
-function loadCallback(res){
-    cache = res;
-    stage = "main";
-    switchScreen();
-}
-
-function authFailedCallback(){
-    stage = "error"
-    switchScreen("Wrong email or password! Please, try again!");
-}
-
-function regFailedCallback(){
-    stage = "error"
-    switchScreen("User already exist!");
-}
-
-function switchScreen(msg) {
-    if(stage === "main"){
-        ReactDOM.render(
-            <Field loadedTasks={JSON.stringify(cache)}/>, root
-        );
-    }else if(stage === "auth"){
-        ReactDOM.render(
-            <Auth/>, root
-        );
-    }else if(stage === "progress"){
-        ReactDOM.render(
-            <Progress/>, root
-        );
-    }else if(stage === "error"){
-        ReactDOM.render(
-            <div>
-                <Auth/>
-                <div className="warning field">
-                    <h2>{msg}</h2>
-                </div>
-            </div>, root
-        );
-    }
-}
-
-$(document).ready(function () {
-    switchScreen();
-});
+ReactDOM.render(
+    <MainContainer/>, root
+);
